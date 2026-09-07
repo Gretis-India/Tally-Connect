@@ -3,3 +3,8 @@ __pycache__/
 *.pyo
 venv/
 .env
+.DS_Store
+*.log
+dist/
+build/
+setup_output/
