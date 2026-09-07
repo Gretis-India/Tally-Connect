@@ -1,0 +1,7 @@
+{
+  "service_name": "Tally Connect Agent",
+  "service_host": "0.0.0.0",
+  "service_port": 9100,
+  "tally_url": "http://localhost:9000",
+  "timeout": 20
+}
