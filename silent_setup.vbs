@@ -8,5 +8,6 @@ Set fso = CreateObject("Scripting.FileSystemObject")
 strPythonw = "pythonw.exe"
 
 ' Launch installer_gui.py completely hidden (0 = hide window)
+' Note: On Windows, pythonw runs scripts without any console window
 WshShell.Run strPythonw & " """ & strCurDir & "\installer_gui.py""", 0, False
 Set WshShell = Nothing

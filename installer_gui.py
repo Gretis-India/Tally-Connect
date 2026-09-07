@@ -6,12 +6,16 @@ and seamless installation of dependencies and tray application.
 """
 import sys
 import os
+import time
 import ctypes
 import subprocess
 import threading
 import tkinter as tk
 from tkinter import ttk, messagebox
-import winreg
+try:
+    import winreg
+except ImportError:
+    winreg = None
 
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 
