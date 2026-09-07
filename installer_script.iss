@@ -6,7 +6,7 @@
 AppId={{D37E84B1-21B5-4D62-A8A9-9FE7B014F94C}
 AppName=Tally Connect
 AppVersion=1.0.0
-AppPublisher=Gretis India
+AppPublisher=Gretis India Private Limited
 AppPublisherURL=https://gretis.com
 DefaultDirName={autopf}\TallyConnect
 DefaultGroupName=Tally Connect
@@ -27,8 +27,8 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Name: "startupicon"; Description: "Automatically launch Tally Connect on Windows Startup"; GroupDescription: "Windows Integration:"
 
 [Files]
-Source: "dist\TallyConnect.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "dist\Uninstaller.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "TallyConnect.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "Uninstaller.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "config.json"; DestDir: "{app}"; Flags: ignoreversion onlyifdoesntexist
 
 [Icons]
