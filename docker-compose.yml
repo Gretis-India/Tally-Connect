@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  tally-connect:
+    build:
+      context: .
+      dockerfile: tally_connect/Dockerfile
+    container_name: tally-connect-agent
+    restart: unless-stopped
+    ports:
+      - "9100:9100"
+    volumes:
+      - ./tally_connect/config.json:/app/tally_connect/config.json
+    environment:
+      - PYTHONUNBUFFERED=1
+      - TALLY_CONNECT_CONFIG=/app/tally_connect/config.json
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9100/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  tally-bridge:
+    build:
+      context: .
+      dockerfile: tally_bridge/Dockerfile
+    container_name: tally-bridge-server
+    restart: unless-stopped
+    ports:
+      - "9200:9200"
+    volumes:
+      - ./tally_bridge/config.json:/app/tally_bridge/config.json
+    environment:
+      - PYTHONUNBUFFERED=1
+      - TALLY_BRIDGE_CONFIG=/app/tally_bridge/config.json
+    depends_on:
+      - tally-connect
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9200/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
