@@ -105,17 +105,25 @@ body {
   color: var(--text-secondary);
   text-decoration: none;
   background: transparent;
-  border: none;
+  border: 1px solid transparent;
   cursor: pointer;
   width: 100%;
   text-align: left;
-  transition: var(--transition);
+  transition: all 0.2s ease-in-out;
 }
 
-.nav-item:hover, .nav-item.active {
+.nav-item:hover {
   color: var(--text-primary);
-  background: var(--pill-bg);
-  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 16px rgba(255, 255, 255, 0.06);
+}
+
+.nav-item.active {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.08);
 }
 
 .live-pulse {
@@ -183,8 +191,8 @@ body {
 
 .btn-pill:hover {
   background: var(--pill-hover);
-  border-color: var(--border-light);
-  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 0 14px rgba(255, 255, 255, 0.08);
 }
 
 .btn-pill.primary {
@@ -194,7 +202,8 @@ body {
 }
 
 .btn-pill.primary:hover {
-  background: #e5e5e7;
+  background: #ffffff;
+  box-shadow: 0 0 18px rgba(255, 255, 255, 0.25);
 }
 
 .content {
