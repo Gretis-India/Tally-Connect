@@ -2,6 +2,7 @@
 Tally Connect System Tray Application.
 Runs in the Windows Taskbar Notification Area (Tray) with Start, Stop, Pause,
 Open Dashboard, Configure, and Exit capabilities.
+Includes file-based logging for troubleshooting.
 """
 import os
 import sys
@@ -9,12 +10,8 @@ import time
 import json
 import threading
 import webbrowser
-from PIL import Image, ImageDraw
-import pystray
-from pystray import MenuItem as item
-import uvicorn
+import logging
 
-# Add current and parent dir to sys.path
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 PARENT_DIR = os.path.dirname(CURRENT_DIR)
 if CURRENT_DIR not in sys.path:
@@ -22,7 +19,26 @@ if CURRENT_DIR not in sys.path:
 if PARENT_DIR not in sys.path:
     sys.path.insert(0, PARENT_DIR)
 
+LOG_FILE = os.path.join(CURRENT_DIR, "tray_app.log")
+logging.basicConfig(
+    filename=LOG_FILE,
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s"
+)
+
+logging.info("Initializing Tally Connect Tray App...")
+
+try:
+    from PIL import Image, ImageDraw
+    import pystray
+    from pystray import MenuItem as item
+    import uvicorn
+except Exception as e:
+    logging.exception(f"Import error in tray_app: {e}")
+    sys.exit(1)
+
 CONFIG_PATH = os.path.join(CURRENT_DIR, "config.json")
+
 
 class TallyTrayApp:
     def __init__(self):
@@ -44,56 +60,79 @@ class TallyTrayApp:
                     self.host = cfg.get("service_host", self.host)
                     self.port = cfg.get("service_port", self.port)
                     self.tally_url = cfg.get("tally_url", self.tally_url)
-            except Exception:
-                pass
+            except Exception as e:
+                logging.error(f"Error loading config: {e}")
 
     def create_icon_image(self, status="running"):
-        """Generates dynamic crisp circle tray icon."""
+        """Generates crisp square tray icon visible on both light and dark taskbars."""
         width = 64
         height = 64
         image = Image.new("RGBA", (width, height), (0, 0, 0, 0))
         draw = ImageDraw.Draw(image)
 
-        # Outer dark ring
-        draw.ellipse((4, 4, 60, 60), fill=(24, 24, 28, 255), outline=(255, 255, 255, 60), width=2)
+        # Background rounded dark circle
+        draw.ellipse((2, 2, 62, 62), fill=(18, 18, 22, 255), outline=(255, 255, 255, 120), width=3)
 
-        # Inner status circle
+        # Status badge color
         if status == "running":
-            color = (48, 209, 88, 255) # iOS Green
+            color = (48, 209, 88, 255) # Green
         elif status == "paused":
             color = (255, 214, 10, 255) # Yellow
         else:
             color = (255, 69, 58, 255) # Red
 
-        draw.ellipse((20, 20, 44, 44), fill=color)
+        # Inner solid circle
+        draw.ellipse((16, 16, 48, 48), fill=color)
+
+        # Draw a white 'T' inside
+        try:
+            draw.rectangle((24, 22, 40, 26), fill=(255, 255, 255, 255))
+            draw.rectangle((30, 26, 34, 42), fill=(255, 255, 255, 255))
+        except Exception:
+            pass
+
         return image
 
     def start_service(self, icon=None, item=None):
         if self.is_running:
             return
-        
-        self.load_config()
-        print(f"[*] Starting Tally Connect Server on {self.host}:{self.port} ...")
-        
-        from tally_connect.main import app
-        config = uvicorn.Config(app=app, host=self.host, port=self.port, log_level="info")
-        self.server = uvicorn.Server(config)
-        
-        def run():
-            self.is_running = True
-            self.is_paused = False
-            self.update_tray_state("running")
-            self.server.run()
-            self.is_running = False
-            self.update_tray_state("stopped")
 
-        self.server_thread = threading.Thread(target=run, daemon=True)
-        self.server_thread.start()
+        self.load_config()
+        logging.info(f"Starting server on {self.host}:{self.port} ...")
+
+        try:
+            from tally_connect.main import app
+            config = uvicorn.Config(
+                app=app,
+                host=self.host,
+                port=self.port,
+                log_level="warning",
+                access_log=False
+            )
+            self.server = uvicorn.Server(config)
+
+            def run():
+                self.is_running = True
+                self.is_paused = False
+                self.update_tray_state("running")
+                try:
+                    self.server.run()
+                except Exception as ex:
+                    logging.exception(f"Uvicorn server crashed: {ex}")
+                finally:
+                    self.is_running = False
+                    self.update_tray_state("stopped")
+
+            self.server_thread = threading.Thread(target=run, daemon=True)
+            self.server_thread.start()
+            logging.info("Server thread started successfully.")
+        except Exception as e:
+            logging.exception(f"Failed to start uvicorn: {e}")
 
     def stop_service(self, icon=None, item=None):
         if not self.is_running or not self.server:
             return
-        print("[*] Stopping Tally Connect Server ...")
+        logging.info("Stopping server...")
         self.server.should_exit = True
         self.is_running = False
         self.is_paused = False
@@ -105,26 +144,30 @@ class TallyTrayApp:
         self.is_paused = not self.is_paused
         status = "paused" if self.is_paused else "running"
         self.update_tray_state(status)
-        print(f"[*] Tally Connect is now {'PAUSED' if self.is_paused else 'RESUMED'}")
+        logging.info(f"Service state changed to {status}")
 
     def update_tray_state(self, status):
         if self.tray_icon:
-            self.tray_icon.icon = self.create_icon_image(status)
-            title_map = {
-                "running": f"Tally Connect: Running (Port {self.port})",
-                "paused": "Tally Connect: Paused",
-                "stopped": "Tally Connect: Stopped"
-            }
-            self.tray_icon.title = title_map.get(status, "Tally Connect")
+            try:
+                self.tray_icon.icon = self.create_icon_image(status)
+                title_map = {
+                    "running": f"Tally Connect: Running (Port {self.port})",
+                    "paused": "Tally Connect: Paused",
+                    "stopped": "Tally Connect: Stopped"
+                }
+                self.tray_icon.title = title_map.get(status, "Tally Connect")
+            except Exception as e:
+                logging.error(f"Failed to update tray icon: {e}")
 
     def open_dashboard(self, icon=None, item=None):
+        logging.info("Opening dashboard...")
         webbrowser.open(f"http://localhost:{self.port}")
 
     def open_api_docs(self, icon=None, item=None):
         webbrowser.open(f"http://localhost:{self.port}/docs")
 
     def exit_app(self, icon=None, item=None):
-        print("[*] Exiting Tally Connect Tray App...")
+        logging.info("Exiting application...")
         self.stop_service()
         if self.tray_icon:
             self.tray_icon.stop()
@@ -145,17 +188,22 @@ class TallyTrayApp:
         )
 
     def run(self):
-        # Start the background service automatically
-        self.start_service()
+        logging.info("Running tray icon loop...")
+        try:
+            self.tray_icon = pystray.Icon(
+                name="TallyConnect",
+                icon=self.create_icon_image("running"),
+                title=f"Tally Connect: Running (Port {self.port})",
+                menu=self.build_menu()
+            )
 
-        # Create system tray icon
-        self.tray_icon = pystray.Icon(
-            name="TallyConnect",
-            icon=self.create_icon_image("running"),
-            title=f"Tally Connect: Running (Port {self.port})",
-            menu=self.build_menu()
-        )
-        self.tray_icon.run()
+            # Start background server
+            self.start_service()
+
+            # Run blocking tray loop
+            self.tray_icon.run()
+        except Exception as e:
+            logging.exception(f"Error in tray run loop: {e}")
 
 if __name__ == "__main__":
     app = TallyTrayApp()
