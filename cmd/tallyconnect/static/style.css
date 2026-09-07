@@ -1,0 +1,406 @@
+/* Apple Minimalist Design - Tally Connect (White, Grey, Black) */
+@import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@200;300;400;500;600&family=Inter:wght@200;300;400;500;600&display=swap');
+
+:root {
+  --bg: #0d0d0f;
+  --bg-sidebar: #131316;
+  --card-bg: #18181c;
+  --card-nested: #202026;
+  --card-nested-hover: #26262e;
+  --border: rgba(255, 255, 255, 0.08);
+  --border-light: rgba(255, 255, 255, 0.16);
+  --text-primary: #f5f5f7;
+  --text-secondary: #86868b;
+  --text-muted: #515154;
+  --pill-bg: rgba(255, 255, 255, 0.06);
+  --pill-hover: rgba(255, 255, 255, 0.12);
+  --status-green: #30d158;
+  --status-red: #ff453a;
+  --font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", sans-serif;
+  --transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text-primary);
+  font-family: var(--font-family);
+  font-weight: 300;
+  letter-spacing: -0.015em;
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.sidebar {
+  width: 260px;
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 28px 20px;
+  flex-shrink: 0;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.brand-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--text-primary);
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
+}
+
+.brand-title {
+  font-size: 17px;
+  font-weight: 400;
+}
+
+.brand-badge {
+  font-size: 10px;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--pill-bg);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+
+.nav-group {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.nav-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  padding: 0 12px 6px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  transition: all 0.2s ease-in-out;
+}
+
+.nav-item:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 16px rgba(255, 255, 255, 0.06);
+}
+
+.nav-item.active {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.08);
+}
+
+.live-pulse {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--status-green);
+  display: inline-block;
+  margin-right: 6px;
+  box-shadow: 0 0 8px var(--status-green);
+}
+
+.live-pulse.offline {
+  background: var(--status-red);
+  box-shadow: 0 0 8px var(--status-red);
+}
+
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.topbar {
+  padding: 24px 36px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(20px);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(13, 13, 15, 0.85);
+}
+
+.page-title {
+  font-size: 22px;
+  font-weight: 300;
+  letter-spacing: -0.02em;
+}
+
+.page-subtitle {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.btn-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 400;
+  background: var(--pill-bg);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: var(--transition);
+  text-decoration: none;
+}
+
+.btn-pill:hover {
+  background: var(--pill-hover);
+  border-color: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 0 14px rgba(255, 255, 255, 0.08);
+}
+
+.btn-pill.primary {
+  background: var(--text-primary);
+  color: #0d0d0f;
+  border-color: var(--text-primary);
+}
+
+.btn-pill.primary:hover {
+  background: #ffffff;
+  box-shadow: 0 0 18px rgba(255, 255, 255, 0.25);
+}
+
+.content {
+  padding: 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 1400px;
+}
+
+.card-outer {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+}
+
+.card-outer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-title {
+  font-size: 16px;
+  font-weight: 400;
+}
+
+.card-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.nested-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 14px;
+}
+
+.card-nested {
+  background: var(--card-nested);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px 18px;
+  transition: var(--transition);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.card-nested:hover {
+  background: var(--card-nested-hover);
+  border-color: var(--border-light);
+}
+
+.pill-tag {
+  font-size: 11px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--pill-bg);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pill-tag.online {
+  border-color: rgba(48, 209, 88, 0.3);
+  color: var(--status-green);
+  background: rgba(48, 209, 88, 0.08);
+}
+
+.pill-tag.offline {
+  border-color: rgba(255, 69, 58, 0.3);
+  color: var(--status-red);
+  background: rgba(255, 69, 58, 0.08);
+}
+
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.stat-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.stat-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+}
+
+.stat-val {
+  font-size: 26px;
+  font-weight: 300;
+}
+
+/* Modal Dialog */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(16px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+  opacity: 0;
+  pointer-events: none;
+  transition: var(--transition);
+}
+
+.modal-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-dialog {
+  background: #18181c;
+  border: 1px solid var(--border-light);
+  border-radius: 24px;
+  width: 480px;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+  transform: scale(0.95);
+  transition: var(--transition);
+}
+
+.modal-overlay.open .modal-dialog {
+  transform: scale(1);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-label {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.input-pill {
+  background: var(--card-nested);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 14px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  outline: none;
+  transition: var(--transition);
+}
+
+.input-pill:focus {
+  border-color: var(--text-primary);
+}
+
+.instructions-box {
+  background: var(--card-nested);
+  border-radius: 12px;
+  padding: 14px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+pre {
+  background: #000;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  font-size: 12px;
+  color: #a1a1a6;
+  font-family: "SF Mono", Menlo, Consolas, monospace;
+  overflow-x: auto;
+  max-height: 400px;
+}

@@ -9,8 +9,12 @@ from fastapi import FastAPI, HTTPException, Query, Body
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from tally_connect.client import TallyClient
-from tally_connect import tdl_templates
+try:
+    from client import TallyClient
+    import tdl_templates
+except ImportError:
+    from tally_connect.client import TallyClient
+    from tally_connect import tdl_templates
 
 # Load Config
 CONFIG_PATH = os.environ.get("TALLY_CONNECT_CONFIG", os.path.join(os.path.dirname(__file__), "config.json"))

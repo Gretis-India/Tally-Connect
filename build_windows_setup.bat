@@ -3,16 +3,13 @@ title Build Tally Connect Windows Setup & Executable
 cd /d %~dp0
 
 echo ============================================================
-echo      Step 1: Installing Required Windows Build Tools
+echo      Step 1: Compiling Native Windows Executable (Go)
 echo ============================================================
-pip install -r requirements.txt
-pip install pystray pillow pyinstaller
-
-echo.
-echo ============================================================
-echo      Step 2: Compiling Standalone TallyConnect.exe
-echo ============================================================
-python build_exe.py
+set CGO_ENABLED=0
+set GOOS=windows
+set GOARCH=amd64
+go build -ldflags="-H=windowsgui -s -w" -o dist\TallyConnect.exe .\cmd\tallyconnect
+go build -ldflags="-H=windowsgui -s -w" -o dist\Uninstaller.exe .\cmd\uninstall
 
 echo.
 echo ============================================================

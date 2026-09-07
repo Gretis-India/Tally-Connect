@@ -64,32 +64,41 @@ class TallyTrayApp:
                 logging.error(f"Error loading config: {e}")
 
     def create_icon_image(self, status="running"):
-        """Generates crisp square tray icon visible on both light and dark taskbars."""
+        """Generates tray icon using our branding with status indicator badge."""
         width = 64
         height = 64
-        image = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+        logo_path = os.path.join(CURRENT_DIR, "static", "Tally_Connect.png")
+        if not os.path.exists(logo_path):
+            logo_path = os.path.join(CURRENT_DIR, "Tally_Connect_Assets", "Logo", "Tally_Connect.png")
+
+        if os.path.exists(logo_path):
+            try:
+                base_img = Image.open(logo_path).convert("RGBA")
+                # Make rounded squircle
+                mask = Image.new("L", (width, height), 0)
+                mask_draw = ImageDraw.Draw(mask)
+                mask_draw.rounded_rectangle([0, 0, width, height], radius=14, fill=255)
+                base_resized = base_img.resize((width, height), Image.Resampling.LANCZOS)
+                image = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+                image.paste(base_resized, (0, 0), mask=mask)
+            except Exception:
+                image = Image.new("RGBA", (width, height), (18, 18, 22, 255))
+        else:
+            image = Image.new("RGBA", (width, height), (18, 18, 22, 255))
+
         draw = ImageDraw.Draw(image)
 
-        # Background rounded dark circle
-        draw.ellipse((2, 2, 62, 62), fill=(18, 18, 22, 255), outline=(255, 255, 255, 120), width=3)
-
-        # Status badge color
+        # Status badge color on bottom right
         if status == "running":
-            color = (48, 209, 88, 255) # Green
+            color = (48, 209, 88, 255)  # Green
         elif status == "paused":
-            color = (255, 214, 10, 255) # Yellow
+            color = (255, 214, 10, 255)  # Yellow
         else:
-            color = (255, 69, 58, 255) # Red
+            color = (255, 69, 58, 255)  # Red
 
-        # Inner solid circle
-        draw.ellipse((16, 16, 48, 48), fill=color)
-
-        # Draw a white 'T' inside
-        try:
-            draw.rectangle((24, 22, 40, 26), fill=(255, 255, 255, 255))
-            draw.rectangle((30, 26, 34, 42), fill=(255, 255, 255, 255))
-        except Exception:
-            pass
+        # Status circle badge on bottom right
+        draw.ellipse((44, 44, 62, 62), fill=(18, 18, 22, 255), outline=(0, 0, 0, 180), width=2)
+        draw.ellipse((47, 47, 59, 59), fill=color)
 
         return image
 
@@ -101,7 +110,11 @@ class TallyTrayApp:
         logging.info(f"Starting server on {self.host}:{self.port} ...")
 
         try:
-            from tally_connect.main import app
+            try:
+                from main import app
+            except ImportError:
+                from tally_connect.main import app
+
             config = uvicorn.Config(
                 app=app,
                 host=self.host,

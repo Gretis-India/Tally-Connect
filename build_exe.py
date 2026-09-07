@@ -22,11 +22,14 @@ def build():
     # Separator for PyInstaller --add-data: ';' on Windows, ':' on Unix
     sep = ";" if sys.platform.startswith("win") else ":"
 
+    icon_path = os.path.join(CURRENT_DIR, "static", "favicon.ico")
+
     cmd = [
         sys.executable, "-m", "PyInstaller",
         "--name=TallyConnect",
         "--noconsole",
         "--onefile",
+        f"--icon={icon_path}",
         f"--add-data={static_path}{sep}static",
         f"--add-data={templates_path}{sep}templates",
         f"--add-data={config_path}{sep}.",
@@ -39,6 +42,9 @@ def build():
         "--hidden-import=uvicorn.lifespans",
         "--hidden-import=uvicorn.lifespans.on",
         "--hidden-import=pystray._win32",
+        "--hidden-import=main",
+        "--hidden-import=client",
+        "--hidden-import=tdl_templates",
         os.path.join(CURRENT_DIR, "tray_app.py")
     ]
 
@@ -49,6 +55,20 @@ def build():
         print(f"Location: {os.path.join(CURRENT_DIR, 'dist', 'TallyConnect.exe' if sys.platform.startswith('win') else 'TallyConnect')}")
     else:
         print(f"\n❌ Build failed with exit code {res.returncode}")
+        return
+
+    # Build Uninstaller.exe
+    print("\n--- Compiling Uninstaller.exe ---")
+    uninstaller_cmd = [
+        sys.executable, "-m", "PyInstaller",
+        "--name=Uninstaller",
+        "--noconsole",
+        "--onefile",
+        f"--icon={icon_path}",
+        "--uac-admin",
+        os.path.join(CURRENT_DIR, "uninstall.py")
+    ]
+    subprocess.run(uninstaller_cmd, cwd=CURRENT_DIR)
 
 if __name__ == "__main__":
     build()
